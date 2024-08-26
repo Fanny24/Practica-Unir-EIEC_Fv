@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Datos de Contacto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            /* Color de fondo */
+            background-color: #f2f2f2; 
+        }
+        h1 {
+            /* Color de título */
+            color: blue; 
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        label {
+            color: blue;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            /* Tamaño de campos de registro */
+            width: 50%; 
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+        input[type="submit"], input[type="button"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        input[type="submit"]:hover, input[type="button"]:hover {
+            background-color: #45a049;
+        }
+        .confirmation {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function eliminarRegistro() {
+            const selectedRow = document.querySelector('input[name="select_row"]:checked');
+
+            if (selectedRow) {
+                const index = selectedRow.value;
+
+                // Enviar petición POST al servidor para eliminar el registro
+                fetch('/eliminar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `index=${index}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Recargar la página para actualizar la tabla
+                        window.location.reload(); 
+                    }
+                });
+            } else {
+                alert('Por favor, seleccione un registro para eliminar.');
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Registro de datos de contacto</h1>
+    <form method="POST">
+        <label for="nombre">Nombre:</label><br>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="apellido">Apellido:</label><br>
+        <input type="text" id="apellido" name="apellido" required><br><br>
+
+        <label for="correo">Correo electrónico:</label><br>
+        <input type="email" id="correo" name="correo" required><br><br>
+
+        <label for="celular">Celular:</label><br>
+        <input type="tel" id="celular" name="celular" required><br><br>
+
+        <input type="submit" value="Grabar">
+        <input type="button" value="Eliminar" onclick="eliminarRegistro()">
+        <a href="/exportar"><input type="button" value="Exportar"></a>
+    </form>
+
+    <h2>Contactos Registrados</h2>
+    <div id="confirmation" class="confirmation"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Seleccionar</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Correo electrónico</th>
+                <th>Celular</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contacto in contactos %}
+            <tr>
+                <td><input type="radio" name="select_row" value="{{ loop.index0 }}"></td>
+                <td>{{ contacto.nombre }}</td>
+                <td>{{ contacto.apellido }}</td>
+                <td>{{ contacto.correo }}</td>
+                <td>{{ contacto.celular }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
